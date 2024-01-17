@@ -8,14 +8,14 @@ import (
 
 const (
 	ActionType_InitNeed     go_best_type.ActionType = "init need"
-	ActionType_ChangeNeed   ActionType              = "change need"
-	ActionType_CheckNotify  ActionType              = "check notify"
-	ActionType_DesignTask   ActionType              = "design task"
-	ActionType_DesignChange ActionType              = "design change"
-	ActionType_Develop      ActionType              = "develop"
-	ActionType_Bug          ActionType              = "bug"
-	ActionType_Test         ActionType              = "test"
-	ActionType_Finished     ActionType              = "finished"
+	ActionType_ChangeNeed   go_best_type.ActionType = "change need"
+	ActionType_CheckNotify  go_best_type.ActionType = "check notify"
+	ActionType_DesignTask   go_best_type.ActionType = "design task"
+	ActionType_DesignChange go_best_type.ActionType = "design change"
+	ActionType_Develop      go_best_type.ActionType = "develop"
+	ActionType_Bug          go_best_type.ActionType = "bug"
+	ActionType_Test         go_best_type.ActionType = "test"
+	ActionType_Finished     go_best_type.ActionType = "finished"
 )
 
 func main() {
@@ -39,26 +39,26 @@ func main() {
 	wg.Add(5)
 	go func() {
 		defer wg.Done()
-		personA.Listen(personA, map[string]IBestType{
+		personA.Listen(personA, map[string]go_best_type.IBestType{
 			"personB": personB,
 			"personE": personE,
 		})
 	}()
 	go func() {
 		defer wg.Done()
-		personB.Listen(personB, map[string]IBestType{
+		personB.Listen(personB, map[string]go_best_type.IBestType{
 			"personC": personC,
 		})
 	}()
 	go func() {
 		defer wg.Done()
-		personC.Listen(personC, map[string]IBestType{
+		personC.Listen(personC, map[string]go_best_type.IBestType{
 			"personD": personD,
 		})
 	}()
 	go func() {
 		defer wg.Done()
-		personD.Listen(personD, map[string]IBestType{
+		personD.Listen(personD, map[string]go_best_type.IBestType{
 			"personA": personA,
 		})
 	}()

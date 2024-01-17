@@ -3,23 +3,21 @@ package main
 import (
 	"context"
 	"fmt"
+	go_best_type "github.com/pefish/go-best-type"
 	"time"
 )
 
 type PersonAType struct {
-	BaseBestType
+	go_best_type.BaseBestType
 }
 
 func NewPersonA(ctx context.Context) *PersonAType {
 	return &PersonAType{
-		BaseBestType: BaseBestType{
-			ctx:     ctx,
-			askChan: make(chan *AskType),
-		},
+		BaseBestType: *go_best_type.NewBaseBestType(ctx),
 	}
 }
 
-func (p *PersonAType) ProcessAsk(ask *AskType, bts map[string]IBestType) {
+func (p *PersonAType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_best_type.IBestType) {
 	switch ask.Action {
 	case ActionType_InitNeed:
 		// 时间长的工作不能影响耳朵收听，新开协程
@@ -29,7 +27,7 @@ func (p *PersonAType) ProcessAsk(ask *AskType, bts map[string]IBestType) {
 			fmt.Printf("【产品经理】需求处理完成。画原型图中。。。\n")
 			time.Sleep(5 * time.Second)
 			fmt.Printf("【产品经理】原型图完成。向 UI 设计师发送设计任务\n")
-			bts["personB"].Ask(&AskType{
+			bts["personB"].Ask(&go_best_type.AskType{
 				Action: "design task",
 			})
 		}()
@@ -40,7 +38,7 @@ func (p *PersonAType) ProcessAsk(ask *AskType, bts map[string]IBestType) {
 			fmt.Printf("【产品经理】需求处理完成。画原型图中。。。\n")
 			time.Sleep(5 * time.Second)
 			fmt.Printf("【产品经理】原型图完成。向 UI 设计师发送设计任务\n")
-			bts["personB"].Ask(&AskType{
+			bts["personB"].Ask(&go_best_type.AskType{
 				Action: "design task",
 			})
 		}()
@@ -49,7 +47,7 @@ func (p *PersonAType) ProcessAsk(ask *AskType, bts map[string]IBestType) {
 			fmt.Printf("【产品经理】收到产品验收请求，验收产品中。。。\n")
 			time.Sleep(5 * time.Second)
 			fmt.Printf("【产品经理】产品验收完成，合格\n")
-			bts["personE"].Ask(&AskType{
+			bts["personE"].Ask(&go_best_type.AskType{
 				Action: "finished",
 			})
 		}()
