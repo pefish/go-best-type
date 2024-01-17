@@ -15,7 +15,7 @@ type IBestType interface {
 	Ask(ask *AskType)
 	Listen(myself IBestType, bts map[string]IBestType)
 	ProcessAsk(ask *AskType, bts map[string]IBestType)
-	Exited()
+	OnExited()
 }
 
 type BaseBestType struct {
@@ -43,7 +43,7 @@ func (b *BaseBestType) Listen(
 		case ask := <-b.askChan:
 			myself.ProcessAsk(ask, bts)
 		case <-b.ctx.Done():
-			myself.Exited()
+			myself.OnExited()
 			return
 		}
 	}

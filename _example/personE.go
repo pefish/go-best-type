@@ -34,6 +34,6 @@ func (p *PersonEType) Start(personA *PersonAType) {
 	})
 }
 
-func (p *PersonEType) Exited() {
+func (p *PersonEType) OnExited() {
 	fmt.Printf("CEO 下班了\n")
 }

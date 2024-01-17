@@ -54,6 +54,6 @@ func (p *PersonAType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_be
 	}
 }
 
-func (p *PersonAType) Exited() {
+func (p *PersonAType) OnExited() {
 	fmt.Printf("【产品经理】下班了\n")
 }

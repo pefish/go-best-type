@@ -40,6 +40,6 @@ func (p *PersonCType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_be
 	}
 }
 
-func (p *PersonCType) Exited() {
+func (p *PersonCType) OnExited() {
 	fmt.Printf("【开发工程师】下班了\n")
 }
