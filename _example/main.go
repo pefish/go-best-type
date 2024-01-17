@@ -2,19 +2,20 @@ package main
 
 import (
 	"context"
+	go_best_type "github.com/pefish/go-best-type"
 	"sync"
 )
 
 const (
-	ActionType_InitNeed     ActionType = "init need"
-	ActionType_ChangeNeed   ActionType = "change need"
-	ActionType_CheckNotify  ActionType = "check notify"
-	ActionType_DesignTask   ActionType = "design task"
-	ActionType_DesignChange ActionType = "design change"
-	ActionType_Develop      ActionType = "develop"
-	ActionType_Bug          ActionType = "bug"
-	ActionType_Test         ActionType = "test"
-	ActionType_Finished     ActionType = "finished"
+	ActionType_InitNeed     go_best_type.ActionType = "init need"
+	ActionType_ChangeNeed   ActionType              = "change need"
+	ActionType_CheckNotify  ActionType              = "check notify"
+	ActionType_DesignTask   ActionType              = "design task"
+	ActionType_DesignChange ActionType              = "design change"
+	ActionType_Develop      ActionType              = "develop"
+	ActionType_Bug          ActionType              = "bug"
+	ActionType_Test         ActionType              = "test"
+	ActionType_Finished     ActionType              = "finished"
 )
 
 func main() {
