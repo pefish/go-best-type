@@ -14,7 +14,7 @@ type PersonEType struct {
 
 func NewPersonE(ctx context.Context, cancelFunc context.CancelFunc) *PersonEType {
 	return &PersonEType{
-		BaseBestType: *go_best_type.NewBaseBestType(ctx),
+		BaseBestType: *go_best_type.NewBaseBestType(ctx, 0),
 		cancelFunc:   cancelFunc,
 	}
 }

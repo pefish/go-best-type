@@ -23,10 +23,10 @@ type BaseBestType struct {
 	askChan chan *AskType
 }
 
-func NewBaseBestType(ctx context.Context) *BaseBestType {
+func NewBaseBestType(ctx context.Context, askChanCap int) *BaseBestType {
 	return &BaseBestType{
 		ctx:     ctx,
-		askChan: make(chan *AskType),
+		askChan: make(chan *AskType, askChanCap),
 	}
 }
 

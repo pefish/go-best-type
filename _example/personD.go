@@ -13,7 +13,7 @@ type PersonDType struct {
 
 func NewPersonD(ctx context.Context) *PersonDType {
 	return &PersonDType{
-		BaseBestType: *go_best_type.NewBaseBestType(ctx),
+		BaseBestType: *go_best_type.NewBaseBestType(ctx, 0),
 	}
 }
 
