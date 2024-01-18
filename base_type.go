@@ -7,8 +7,9 @@ import (
 type ActionType string
 
 type AskType struct {
-	Action ActionType
-	Data   interface{}
+	Action     ActionType
+	AnswerChan chan<- interface{}
+	Data       interface{}
 }
 
 type IBestType interface {
