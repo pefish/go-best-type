@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"time"
+
 	go_best_type "github.com/pefish/go-best-type"
-	"sync"
+	go_logger "github.com/pefish/go-logger"
 )
 
 const (
@@ -19,8 +21,6 @@ const (
 )
 
 func main() {
-	var wg sync.WaitGroup
-
 	// 每个人非常积极负责任的传达消息，不存在需要催的情况，这样的效率才是最高的
 	// 假设一个产品开发的场景（A：产品经理，B：UI设计师，C：开发工程师，D：测试工程师，E：CEO）
 	// A：接收处理需求、接收产品验收通知、接收需求的变更
@@ -30,43 +30,24 @@ func main() {
 
 	adminCtx, cancel := context.WithCancel(context.Background())
 
-	personA := NewPersonA(adminCtx)
-	personB := NewPersonB(adminCtx)
-	personC := NewPersonC(adminCtx)
-	personD := NewPersonD(adminCtx)
-	personE := NewPersonE(adminCtx, cancel)
-
-	wg.Add(5)
-	go func() {
-		defer wg.Done()
-		personA.Listen(personA, map[string]go_best_type.IBestType{
-			"personB": personB,
-			"personE": personE,
-		})
-	}()
-	go func() {
-		defer wg.Done()
-		personB.Listen(personB, map[string]go_best_type.IBestType{
-			"personC": personC,
-		})
-	}()
-	go func() {
-		defer wg.Done()
-		personC.Listen(personC, map[string]go_best_type.IBestType{
-			"personD": personD,
-		})
-	}()
-	go func() {
-		defer wg.Done()
-		personD.Listen(personD, map[string]go_best_type.IBestType{
-			"personA": personA,
-		})
-	}()
+	btsCollect := make(map[string]go_best_type.IBestType, 0) // 团队
+	personA := NewPersonA(adminCtx, btsCollect)
+	btsCollect["personA"] = personA // 加入团队
+	personB := NewPersonB(adminCtx, btsCollect)
+	btsCollect["personB"] = personB
+	personC := NewPersonC(adminCtx, btsCollect)
+	btsCollect["personC"] = personC
+	personD := NewPersonD(adminCtx, btsCollect)
+	btsCollect["personD"] = personD
 
 	// CEO 提出需求
-	personE.Start(personA)
-	personE.Listen(personE, nil)
-	wg.Done()
+	answer := personA.AskForAnswer(&go_best_type.AskType{
+		Action: ActionType_InitNeed,
+	})
+	if answer.(string) == "finished" {
+		go_logger.Logger.InfoF("完成了，大家可以休息了。")
+		cancel()
+	}
 
-	wg.Wait()
+	time.Sleep(time.Second)
 }

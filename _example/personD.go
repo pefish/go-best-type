@@ -11,20 +11,20 @@ type PersonDType struct {
 	go_best_type.BaseBestType
 }
 
-func NewPersonD(ctx context.Context) *PersonDType {
+func NewPersonD(ctx context.Context, bts map[string]go_best_type.IBestType) *PersonDType {
 	p := &PersonDType{}
-	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, 0)
+	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, bts, 0)
 	return p
 }
 
-func (p *PersonDType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_best_type.IBestType) {
+func (p *PersonDType) ProcessAsk(ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_Test:
 		go func() {
-			p.Logger().InfoF("收到测试任务，测试中。。。\n")
+			p.Logger().InfoF("收到测试任务，测试中。。。")
 			time.Sleep(5 * time.Second)
-			p.Logger().InfoF("测试完成。提交产品验收\n")
-			bts["personA"].Ask(&go_best_type.AskType{
+			p.Logger().InfoF("测试完成。提交产品验收")
+			p.BtsCollect()["personA"].Ask(&go_best_type.AskType{
 				Action: "check notify",
 			})
 		}()
@@ -32,7 +32,7 @@ func (p *PersonDType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_be
 }
 
 func (p *PersonDType) OnExited() {
-	p.Logger().InfoF("下班了\n")
+	p.Logger().InfoF("下班了")
 }
 
 func (p *PersonDType) Name() string {

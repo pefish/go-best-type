@@ -9,53 +9,58 @@ import (
 
 type PersonAType struct {
 	go_best_type.BaseBestType
+	ceoAnswer chan interface{}
 }
 
-func NewPersonA(ctx context.Context) *PersonAType {
+func NewPersonA(ctx context.Context, bts map[string]go_best_type.IBestType) *PersonAType {
 	p := &PersonAType{}
-	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, 0)
+	p.BaseBestType = *go_best_type.NewBaseBestType(
+		ctx,
+		p,
+		bts,
+		0,
+	)
 	return p
 }
 
-func (p *PersonAType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_best_type.IBestType) {
+func (p *PersonAType) ProcessAsk(ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_InitNeed:
 		// 时间长的工作不能影响耳朵收听，新开协程
 		go func() {
-			p.Logger().InfoF("收到新需求 <%s>，处理需求中。。。\n", ask.Action)
+			p.Logger().InfoF("收到新需求 <%s>，处理需求中。。。", ask.Action)
 			time.Sleep(5 * time.Second)
-			p.Logger().InfoF("需求处理完成。画原型图中。。。\n")
+			p.Logger().InfoF("需求处理完成。画原型图中。。。")
 			time.Sleep(5 * time.Second)
-			p.Logger().InfoF("原型图完成。向 UI 设计师发送设计任务\n")
-			bts["personB"].Ask(&go_best_type.AskType{
+			p.Logger().InfoF("原型图完成。向 UI 设计师发送设计任务")
+			p.BtsCollect()["personB"].Ask(&go_best_type.AskType{
 				Action: "design task",
 			})
 		}()
+		p.ceoAnswer = ask.AnswerChan
 	case ActionType_ChangeNeed:
 		go func() {
-			p.Logger().InfoF("收到需求变更 <%s>，处理需求中。。。\n", ask.Action)
+			p.Logger().InfoF("收到需求变更 <%s>，处理需求中。。。", ask.Action)
 			time.Sleep(5 * time.Second)
-			p.Logger().InfoF("需求处理完成。画原型图中。。。\n")
+			p.Logger().InfoF("需求处理完成。画原型图中。。。")
 			time.Sleep(5 * time.Second)
-			p.Logger().InfoF("原型图完成。向 UI 设计师发送设计任务\n")
-			bts["personB"].Ask(&go_best_type.AskType{
+			p.Logger().InfoF("原型图完成。向 UI 设计师发送设计任务")
+			p.BtsCollect()["personB"].Ask(&go_best_type.AskType{
 				Action: "design task",
 			})
 		}()
 	case ActionType_CheckNotify:
 		go func() {
-			p.Logger().InfoF("收到产品验收请求，验收产品中。。。\n")
+			p.Logger().InfoF("收到产品验收请求，验收产品中。。。")
 			time.Sleep(5 * time.Second)
-			p.Logger().InfoF("产品验收完成，合格\n")
-			bts["personE"].Ask(&go_best_type.AskType{
-				Action: "finished",
-			})
+			p.Logger().InfoF("产品验收完成，合格")
+			p.ceoAnswer <- "finished"
 		}()
 	}
 }
 
 func (p *PersonAType) OnExited() {
-	p.Logger().InfoF("下班了\n")
+	p.Logger().InfoF("下班了")
 }
 
 func (p *PersonAType) Name() string {
