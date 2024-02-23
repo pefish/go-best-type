@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
-	go_best_type "github.com/pefish/go-best-type"
 	"time"
+
+	go_best_type "github.com/pefish/go-best-type"
 )
 
 type PersonCType struct {
@@ -12,27 +12,27 @@ type PersonCType struct {
 }
 
 func NewPersonC(ctx context.Context) *PersonCType {
-	return &PersonCType{
-		BaseBestType: *go_best_type.NewBaseBestType(ctx, 0),
-	}
+	p := &PersonCType{}
+	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, 0)
+	return p
 }
 
 func (p *PersonCType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_best_type.IBestType) {
 	switch ask.Action {
 	case ActionType_Develop:
 		go func() {
-			fmt.Printf("【开发工程师】收到开发任务 <%s>，开发中。。。\n", ask.Action)
+			p.Logger().InfoF("收到开发任务 <%s>，开发中。。。\n", ask.Action)
 			time.Sleep(5 * time.Second)
-			fmt.Printf("【开发工程师】开发完成。向测试工程师提交测试\n")
+			p.Logger().InfoF("开发完成。向测试工程师提交测试\n")
 			bts["personD"].Ask(&go_best_type.AskType{
 				Action: "test",
 			})
 		}()
 	case ActionType_Bug:
 		go func() {
-			fmt.Printf("【开发工程师】收到 Bug <%s>，修复中。。。\n", ask.Action)
+			p.Logger().InfoF("收到 Bug <%s>，修复中。。。\n", ask.Action)
 			time.Sleep(5 * time.Second)
-			fmt.Printf("【开发工程师】修复完成。向测试工程师提交测试\n")
+			p.Logger().InfoF("修复完成。向测试工程师提交测试\n")
 			bts["personD"].Ask(&go_best_type.AskType{
 				Action: "test",
 			})
@@ -41,5 +41,9 @@ func (p *PersonCType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_be
 }
 
 func (p *PersonCType) OnExited() {
-	fmt.Printf("【开发工程师】下班了\n")
+	p.Logger().InfoF("下班了\n")
+}
+
+func (p *PersonCType) Name() string {
+	return "开发工程师"
 }

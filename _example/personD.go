@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"fmt"
-	go_best_type "github.com/pefish/go-best-type"
 	"time"
+
+	go_best_type "github.com/pefish/go-best-type"
 )
 
 type PersonDType struct {
@@ -12,18 +12,18 @@ type PersonDType struct {
 }
 
 func NewPersonD(ctx context.Context) *PersonDType {
-	return &PersonDType{
-		BaseBestType: *go_best_type.NewBaseBestType(ctx, 0),
-	}
+	p := &PersonDType{}
+	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, 0)
+	return p
 }
 
 func (p *PersonDType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_best_type.IBestType) {
 	switch ask.Action {
 	case ActionType_Test:
 		go func() {
-			fmt.Printf("【测试工程师】收到测试任务，测试中。。。\n")
+			p.Logger().InfoF("收到测试任务，测试中。。。\n")
 			time.Sleep(5 * time.Second)
-			fmt.Printf("【测试工程师】测试完成。提交产品验收\n")
+			p.Logger().InfoF("测试完成。提交产品验收\n")
 			bts["personA"].Ask(&go_best_type.AskType{
 				Action: "check notify",
 			})
@@ -32,5 +32,9 @@ func (p *PersonDType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_be
 }
 
 func (p *PersonDType) OnExited() {
-	fmt.Printf("【测试工程师】下班了\n")
+	p.Logger().InfoF("下班了\n")
+}
+
+func (p *PersonDType) Name() string {
+	return "测试工程师"
 }

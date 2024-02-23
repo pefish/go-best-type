@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+
 	go_best_type "github.com/pefish/go-best-type"
 )
 
@@ -13,16 +13,15 @@ type PersonEType struct {
 }
 
 func NewPersonE(ctx context.Context, cancelFunc context.CancelFunc) *PersonEType {
-	return &PersonEType{
-		BaseBestType: *go_best_type.NewBaseBestType(ctx, 0),
-		cancelFunc:   cancelFunc,
-	}
+	p := &PersonEType{}
+	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, 0)
+	return p
 }
 
 func (p *PersonEType) ProcessAsk(ask *go_best_type.AskType, bts map[string]go_best_type.IBestType) {
 	switch ask.Action {
 	case ActionType_Finished:
-		fmt.Printf("【CEO】产品开发完成，恭喜各位，可以休息了！！！\n")
+		p.Logger().InfoF("产品开发完成，恭喜各位，可以休息了！！！\n")
 		p.cancelFunc()
 		return
 	}
@@ -35,5 +34,9 @@ func (p *PersonEType) Start(personA *PersonAType) {
 }
 
 func (p *PersonEType) OnExited() {
-	fmt.Printf("CEO 下班了\n")
+	p.Logger().InfoF("下班了\n")
+}
+
+func (p *PersonEType) Name() string {
+	return "CEO"
 }
