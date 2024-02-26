@@ -17,7 +17,7 @@ type AskType struct {
 type IBestType interface {
 	Ask(ask *AskType)
 	AskForAnswer(ask *AskType) interface{}
-	ProcessAsk(ask *AskType)
+	ProcessAsk(ctx context.Context, ask *AskType)
 	Name() string
 	BtsCollect() map[string]IBestType
 	OnExited()
@@ -46,7 +46,7 @@ func NewBaseBestType(
 		for {
 			select {
 			case ask := <-b.askChan:
-				myself.ProcessAsk(ask)
+				myself.ProcessAsk(ctx, ask)
 			case <-b.ctx.Done():
 				myself.OnExited()
 				return

@@ -17,7 +17,7 @@ func NewPersonC(ctx context.Context, bts map[string]go_best_type.IBestType) *Per
 	return p
 }
 
-func (p *PersonCType) ProcessAsk(ask *go_best_type.AskType) {
+func (p *PersonCType) ProcessAsk(ctx context.Context, ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_Develop:
 		go func() {
