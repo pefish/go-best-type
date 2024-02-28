@@ -44,32 +44,35 @@ func NewBaseBestType(
 	bestTypeManager *BestTypeManager,
 	askChanCap int,
 ) *BaseBestType {
-	stopCtx, stopCancel := context.WithCancel(context.Background())
-	terminalCtx, terminalCancel := context.WithCancel(context.Background())
-
 	b := &BaseBestType{
 		logger:          go_logger.Logger.CloneWithPrefix(myself.Name()),
 		askChan:         make(chan *AskType, askChanCap),
 		bestTypeManager: bestTypeManager,
-		stopCancel:      stopCancel,
-		terminalCancel:  terminalCancel,
 	}
 
 	go func() {
 		for ask := range b.askChan {
 			switch ask.Action {
 			case ActionType_Start:
+				stopCtx, stopCancel := context.WithCancel(context.Background())
+				terminalCtx, terminalCancel := context.WithCancel(context.Background())
+				b.stopCancel = stopCancel
+				b.terminalCancel = terminalCancel
 				bestTypeManager.WaitGroup().Add(1)
 				go func(ask *AskType) {
 					defer bestTypeManager.WaitGroup().Done()
 					myself.Start(stopCtx, terminalCtx, ask)
 				}(ask)
 			case ActionType_Stop:
-				stopCancel()
+				b.stopCancel()
 			case ActionType_Terminal:
-				terminalCancel()
+				b.terminalCancel()
 				return
 			default:
+				stopCtx, stopCancel := context.WithCancel(context.Background())
+				terminalCtx, terminalCancel := context.WithCancel(context.Background())
+				b.stopCancel = stopCancel
+				b.terminalCancel = terminalCancel
 				bestTypeManager.WaitGroup().Add(1)
 				go func(ask *AskType) {
 					defer bestTypeManager.WaitGroup().Done()
