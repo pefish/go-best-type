@@ -22,7 +22,6 @@ func (b *BestTypeManager) Get(name string) IBestType {
 }
 
 func (b *BestTypeManager) Set(name string, bestType IBestType) {
-	b.wg.Add(1)
 	b.btsCollect.Store(name, bestType)
 }
 

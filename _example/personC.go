@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"time"
 
 	go_best_type "github.com/pefish/go-best-type"
@@ -16,15 +17,10 @@ func NewPersonC(bestTypeManager *go_best_type.BestTypeManager) *PersonCType {
 	return p
 }
 
-func (p *PersonCType) Start(ask *go_best_type.AskType) {}
-
-func (p *PersonCType) Stop(ask *go_best_type.AskType) {
-	p.Logger().InfoF("下班了")
+func (p *PersonCType) Start(stopCtx context.Context, terminalCtx context.Context, ask *go_best_type.AskType) {
 }
 
-func (p *PersonCType) Terminal(ask *go_best_type.AskType) {}
-
-func (p *PersonCType) ProcessOtherAsk(ask *go_best_type.AskType) {
+func (p *PersonCType) ProcessOtherAsk(stopCtx context.Context, terminalCtx context.Context, ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_Develop:
 		go func() {
@@ -44,6 +40,12 @@ func (p *PersonCType) ProcessOtherAsk(ask *go_best_type.AskType) {
 				Action: "test",
 			})
 		}()
+	}
+
+	select {
+	case <-stopCtx.Done():
+		p.Logger().InfoF("<%s> 做完了", ask.Action)
+	case <-terminalCtx.Done():
 	}
 }
 

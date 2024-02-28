@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"time"
 
 	go_best_type "github.com/pefish/go-best-type"
@@ -21,15 +22,10 @@ func NewPersonA(bestTypeManager *go_best_type.BestTypeManager) *PersonAType {
 	return p
 }
 
-func (p *PersonAType) Start(ask *go_best_type.AskType) {}
-
-func (p *PersonAType) Stop(ask *go_best_type.AskType) {
-	p.Logger().InfoF("下班了")
+func (p *PersonAType) Start(stopCtx context.Context, terminalCtx context.Context, ask *go_best_type.AskType) {
 }
 
-func (p *PersonAType) Terminal(ask *go_best_type.AskType) {}
-
-func (p *PersonAType) ProcessOtherAsk(ask *go_best_type.AskType) {
+func (p *PersonAType) ProcessOtherAsk(stopCtx context.Context, terminalCtx context.Context, ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_InitNeed:
 		// 时间长的工作不能影响耳朵收听，新开协程
@@ -62,6 +58,12 @@ func (p *PersonAType) ProcessOtherAsk(ask *go_best_type.AskType) {
 			p.Logger().InfoF("产品验收完成，合格")
 			p.ceoAnswer <- "finished"
 		}()
+	}
+
+	select {
+	case <-stopCtx.Done():
+		p.Logger().InfoF("<%s> 做完了", ask.Action)
+	case <-terminalCtx.Done():
 	}
 }
 

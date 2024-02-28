@@ -1,6 +1,8 @@
 package go_best_type
 
 import (
+	"context"
+
 	go_logger "github.com/pefish/go-logger"
 )
 
@@ -19,10 +21,8 @@ type AskType struct {
 }
 
 type IBestType interface {
-	Start(ask *AskType)
-	ProcessOtherAsk(ask *AskType)
-	Stop(ask *AskType)
-	Terminal(ask *AskType)
+	Start(stopCtx context.Context, terminalCtx context.Context, ask *AskType)
+	ProcessOtherAsk(stopCtx context.Context, terminalCtx context.Context, ask *AskType)
 	Name() string
 
 	Ask(ask *AskType)
@@ -34,6 +34,9 @@ type BaseBestType struct {
 	logger          go_logger.InterfaceLogger
 	askChan         chan *AskType
 	bestTypeManager *BestTypeManager
+
+	stopCancel     context.CancelFunc
+	terminalCancel context.CancelFunc
 }
 
 func NewBaseBestType(
@@ -41,27 +44,38 @@ func NewBaseBestType(
 	bestTypeManager *BestTypeManager,
 	askChanCap int,
 ) *BaseBestType {
+	stopCtx, stopCancel := context.WithCancel(context.Background())
+	terminalCtx, terminalCancel := context.WithCancel(context.Background())
+
 	b := &BaseBestType{
 		logger:          go_logger.Logger.CloneWithPrefix(myself.Name()),
 		askChan:         make(chan *AskType, askChanCap),
 		bestTypeManager: bestTypeManager,
+		stopCancel:      stopCancel,
+		terminalCancel:  terminalCancel,
 	}
 
 	go func() {
 		for ask := range b.askChan {
 			switch ask.Action {
 			case ActionType_Start:
-				go myself.Start(ask)
+				bestTypeManager.WaitGroup().Add(1)
+				go func(ask *AskType) {
+					defer bestTypeManager.WaitGroup().Done()
+					myself.Start(stopCtx, terminalCtx, ask)
+				}(ask)
 			case ActionType_Stop:
-				myself.Stop(ask)
-				bestTypeManager.WaitGroup().Done()
+				stopCancel()
 				return
 			case ActionType_Terminal:
-				myself.Terminal(ask)
-				bestTypeManager.WaitGroup().Done()
+				terminalCancel()
 				return
 			default:
-				go myself.ProcessOtherAsk(ask)
+				bestTypeManager.WaitGroup().Add(1)
+				go func(ask *AskType) {
+					defer bestTypeManager.WaitGroup().Done()
+					myself.ProcessOtherAsk(stopCtx, terminalCtx, ask)
+				}(ask)
 			}
 		}
 	}()
