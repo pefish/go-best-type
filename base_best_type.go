@@ -15,45 +15,38 @@ type AskType struct {
 }
 
 type IBestType interface {
+	AskChan() chan *AskType
 	Ask(ask *AskType)
 	AskForAnswer(ask *AskType) interface{}
 	ProcessAsk(ctx context.Context, ask *AskType)
 	Name() string
-	BtsCollect() map[string]IBestType
+	BestTypeManager() *BestTypeManager
 	OnExited()
 }
 
 type BaseBestType struct {
-	ctx        context.Context
-	logger     go_logger.InterfaceLogger
-	askChan    chan *AskType
-	btsCollect map[string]IBestType
+	ctx             context.Context
+	logger          go_logger.InterfaceLogger
+	askChan         chan *AskType
+	bestTypeManager *BestTypeManager
 }
 
 func NewBaseBestType(
 	ctx context.Context,
 	myself IBestType,
-	btsCollect map[string]IBestType,
+	bestTypeManager *BestTypeManager,
 	askChanCap int,
 ) *BaseBestType {
-	b := &BaseBestType{
-		ctx:        ctx,
-		logger:     go_logger.Logger.CloneWithPrefix(myself.Name()),
-		askChan:    make(chan *AskType, askChanCap),
-		btsCollect: btsCollect,
+	return &BaseBestType{
+		ctx:             ctx,
+		logger:          go_logger.Logger.CloneWithPrefix(myself.Name()),
+		askChan:         make(chan *AskType, askChanCap),
+		bestTypeManager: bestTypeManager,
 	}
-	go func() {
-		for {
-			select {
-			case ask := <-b.askChan:
-				myself.ProcessAsk(ctx, ask)
-			case <-b.ctx.Done():
-				myself.OnExited()
-				return
-			}
-		}
-	}()
-	return b
+}
+
+func (b *BaseBestType) AskChan() chan *AskType {
+	return b.askChan
 }
 
 func (b *BaseBestType) Logger() go_logger.InterfaceLogger {
@@ -72,6 +65,6 @@ func (b *BaseBestType) AskForAnswer(ask *AskType) interface{} {
 	return <-ask.AnswerChan
 }
 
-func (b *BaseBestType) BtsCollect() map[string]IBestType {
-	return b.btsCollect
+func (b *BaseBestType) BestTypeManager() *BestTypeManager {
+	return b.bestTypeManager
 }

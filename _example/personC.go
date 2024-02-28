@@ -11,9 +11,9 @@ type PersonCType struct {
 	go_best_type.BaseBestType
 }
 
-func NewPersonC(ctx context.Context, bts map[string]go_best_type.IBestType) *PersonCType {
+func NewPersonC(ctx context.Context, bestTypeManager *go_best_type.BestTypeManager) *PersonCType {
 	p := &PersonCType{}
-	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, bts, 0)
+	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, bestTypeManager, 0)
 	return p
 }
 
@@ -24,7 +24,7 @@ func (p *PersonCType) ProcessAsk(ctx context.Context, ask *go_best_type.AskType)
 			p.Logger().InfoF("收到开发任务 <%s>，开发中。。。", ask.Action)
 			time.Sleep(5 * time.Second)
 			p.Logger().InfoF("开发完成。向测试工程师提交测试")
-			p.BtsCollect()["personD"].Ask(&go_best_type.AskType{
+			p.BestTypeManager().Get("personD").Ask(&go_best_type.AskType{
 				Action: "test",
 			})
 		}()
@@ -33,7 +33,7 @@ func (p *PersonCType) ProcessAsk(ctx context.Context, ask *go_best_type.AskType)
 			p.Logger().InfoF("收到 Bug <%s>，修复中。。。", ask.Action)
 			time.Sleep(5 * time.Second)
 			p.Logger().InfoF("修复完成。向测试工程师提交测试")
-			p.BtsCollect()["personD"].Ask(&go_best_type.AskType{
+			p.BestTypeManager().Get("personD").Ask(&go_best_type.AskType{
 				Action: "test",
 			})
 		}()

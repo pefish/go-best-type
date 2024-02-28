@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"time"
 
 	go_best_type "github.com/pefish/go-best-type"
 	go_logger "github.com/pefish/go-logger"
@@ -30,15 +29,19 @@ func main() {
 
 	adminCtx, cancel := context.WithCancel(context.Background())
 
-	btsCollect := make(map[string]go_best_type.IBestType, 0) // 团队
-	personA := NewPersonA(adminCtx, btsCollect)
-	btsCollect["personA"] = personA // 加入团队
-	personB := NewPersonB(adminCtx, btsCollect)
-	btsCollect["personB"] = personB
-	personC := NewPersonC(adminCtx, btsCollect)
-	btsCollect["personC"] = personC
-	personD := NewPersonD(adminCtx, btsCollect)
-	btsCollect["personD"] = personD
+	bestTypeManager := go_best_type.NewBestTypeManager(adminCtx) // 组建团队
+
+	personA := NewPersonA(adminCtx, bestTypeManager)
+	bestTypeManager.Set("personA", personA) // 加入团队并进入等待工作状态
+
+	personB := NewPersonB(adminCtx, bestTypeManager)
+	bestTypeManager.Set("personB", personB)
+
+	personC := NewPersonC(adminCtx, bestTypeManager)
+	bestTypeManager.Set("personC", personC)
+
+	personD := NewPersonD(adminCtx, bestTypeManager)
+	bestTypeManager.Set("personD", personD)
 
 	// CEO 提出需求
 	answer := personA.AskForAnswer(&go_best_type.AskType{
@@ -49,5 +52,5 @@ func main() {
 		cancel()
 	}
 
-	time.Sleep(time.Second)
+	bestTypeManager.Wait() // 解散团队
 }

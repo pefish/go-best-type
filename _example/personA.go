@@ -12,12 +12,12 @@ type PersonAType struct {
 	ceoAnswer chan interface{}
 }
 
-func NewPersonA(ctx context.Context, bts map[string]go_best_type.IBestType) *PersonAType {
+func NewPersonA(ctx context.Context, bestTypeManager *go_best_type.BestTypeManager) *PersonAType {
 	p := &PersonAType{}
 	p.BaseBestType = *go_best_type.NewBaseBestType(
 		ctx,
 		p,
-		bts,
+		bestTypeManager,
 		0,
 	)
 	return p
@@ -33,7 +33,7 @@ func (p *PersonAType) ProcessAsk(ctx context.Context, ask *go_best_type.AskType)
 			p.Logger().InfoF("需求处理完成。画原型图中。。。")
 			time.Sleep(5 * time.Second)
 			p.Logger().InfoF("原型图完成。向 UI 设计师发送设计任务")
-			p.BtsCollect()["personB"].Ask(&go_best_type.AskType{
+			p.BestTypeManager().Get("personB").Ask(&go_best_type.AskType{
 				Action: "design task",
 			})
 		}()
@@ -45,7 +45,7 @@ func (p *PersonAType) ProcessAsk(ctx context.Context, ask *go_best_type.AskType)
 			p.Logger().InfoF("需求处理完成。画原型图中。。。")
 			time.Sleep(5 * time.Second)
 			p.Logger().InfoF("原型图完成。向 UI 设计师发送设计任务")
-			p.BtsCollect()["personB"].Ask(&go_best_type.AskType{
+			p.BestTypeManager().Get("personB").Ask(&go_best_type.AskType{
 				Action: "design task",
 			})
 		}()

@@ -11,9 +11,9 @@ type PersonDType struct {
 	go_best_type.BaseBestType
 }
 
-func NewPersonD(ctx context.Context, bts map[string]go_best_type.IBestType) *PersonDType {
+func NewPersonD(ctx context.Context, bestTypeManager *go_best_type.BestTypeManager) *PersonDType {
 	p := &PersonDType{}
-	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, bts, 0)
+	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, bestTypeManager, 0)
 	return p
 }
 
@@ -24,7 +24,7 @@ func (p *PersonDType) ProcessAsk(ctx context.Context, ask *go_best_type.AskType)
 			p.Logger().InfoF("收到测试任务，测试中。。。")
 			time.Sleep(5 * time.Second)
 			p.Logger().InfoF("测试完成。提交产品验收")
-			p.BtsCollect()["personA"].Ask(&go_best_type.AskType{
+			p.BestTypeManager().Get("personA").Ask(&go_best_type.AskType{
 				Action: "check notify",
 			})
 		}()
