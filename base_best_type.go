@@ -1,12 +1,16 @@
 package go_best_type
 
 import (
-	"context"
-
 	go_logger "github.com/pefish/go-logger"
 )
 
 type ActionType string
+
+const (
+	ActionType_Start    ActionType = "start"
+	ActionType_Stop     ActionType = "stop"
+	ActionType_Terminal ActionType = "terminal"
+)
 
 type AskType struct {
 	Action     ActionType
@@ -15,43 +19,54 @@ type AskType struct {
 }
 
 type IBestType interface {
-	Context() context.Context
-	AskChan() chan *AskType
+	Start(ask *AskType)
+	ProcessOtherAsk(ask *AskType)
+	Stop(ask *AskType)
+	Terminal(ask *AskType)
+	Name() string
+
 	Ask(ask *AskType)
 	AskForAnswer(ask *AskType) interface{}
-	ProcessAsk(ask *AskType)
-	Name() string
 	BestTypeManager() *BestTypeManager
-	OnExited()
 }
 
 type BaseBestType struct {
-	ctx             context.Context
 	logger          go_logger.InterfaceLogger
 	askChan         chan *AskType
 	bestTypeManager *BestTypeManager
 }
 
 func NewBaseBestType(
-	ctx context.Context,
 	myself IBestType,
 	bestTypeManager *BestTypeManager,
 	askChanCap int,
 ) *BaseBestType {
-	return &BaseBestType{
-		ctx:             ctx,
+	b := &BaseBestType{
 		logger:          go_logger.Logger.CloneWithPrefix(myself.Name()),
 		askChan:         make(chan *AskType, askChanCap),
 		bestTypeManager: bestTypeManager,
 	}
-}
 
-func (b *BaseBestType) AskChan() chan *AskType {
-	return b.askChan
-}
+	go func() {
+		for ask := range b.askChan {
+			switch ask.Action {
+			case ActionType_Start:
+				go myself.Start(ask)
+			case ActionType_Stop:
+				myself.Stop(ask)
+				bestTypeManager.WaitGroup().Done()
+				return
+			case ActionType_Terminal:
+				myself.Terminal(ask)
+				bestTypeManager.WaitGroup().Done()
+				return
+			default:
+				go myself.ProcessOtherAsk(ask)
+			}
+		}
+	}()
 
-func (b *BaseBestType) Context() context.Context {
-	return b.ctx
+	return b
 }
 
 func (b *BaseBestType) Logger() go_logger.InterfaceLogger {

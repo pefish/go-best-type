@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-
 	go_best_type "github.com/pefish/go-best-type"
 	go_logger "github.com/pefish/go-logger"
 )
@@ -27,20 +25,18 @@ func main() {
 	// C：接收开发任务、接收 Bug
 	// D：接收测试任务、接收 Bug 验收
 
-	adminCtx, cancel := context.WithCancel(context.Background())
+	bestTypeManager := go_best_type.NewBestTypeManager() // 组建团队
 
-	bestTypeManager := go_best_type.NewBestTypeManager(adminCtx) // 组建团队
-
-	personA := NewPersonA(adminCtx, bestTypeManager)
+	personA := NewPersonA(bestTypeManager)
 	bestTypeManager.Set("personA", personA) // 加入团队并进入等待工作状态
 
-	personB := NewPersonB(adminCtx, bestTypeManager)
+	personB := NewPersonB(bestTypeManager)
 	bestTypeManager.Set("personB", personB)
 
-	personC := NewPersonC(adminCtx, bestTypeManager)
+	personC := NewPersonC(bestTypeManager)
 	bestTypeManager.Set("personC", personC)
 
-	personD := NewPersonD(adminCtx, bestTypeManager)
+	personD := NewPersonD(bestTypeManager)
 	bestTypeManager.Set("personD", personD)
 
 	// CEO 提出需求
@@ -49,7 +45,7 @@ func main() {
 	})
 	if answer.(string) == "finished" {
 		go_logger.Logger.InfoF("完成了，大家可以休息了。")
-		cancel()
+		bestTypeManager.StopAllAsync()
 	}
 
 	bestTypeManager.Wait() // 解散团队

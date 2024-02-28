@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"time"
 
 	go_best_type "github.com/pefish/go-best-type"
@@ -12,10 +11,9 @@ type PersonAType struct {
 	ceoAnswer chan interface{}
 }
 
-func NewPersonA(ctx context.Context, bestTypeManager *go_best_type.BestTypeManager) *PersonAType {
+func NewPersonA(bestTypeManager *go_best_type.BestTypeManager) *PersonAType {
 	p := &PersonAType{}
 	p.BaseBestType = *go_best_type.NewBaseBestType(
-		ctx,
 		p,
 		bestTypeManager,
 		0,
@@ -23,7 +21,15 @@ func NewPersonA(ctx context.Context, bestTypeManager *go_best_type.BestTypeManag
 	return p
 }
 
-func (p *PersonAType) ProcessAsk(ask *go_best_type.AskType) {
+func (p *PersonAType) Start(ask *go_best_type.AskType) {}
+
+func (p *PersonAType) Stop(ask *go_best_type.AskType) {
+	p.Logger().InfoF("下班了")
+}
+
+func (p *PersonAType) Terminal(ask *go_best_type.AskType) {}
+
+func (p *PersonAType) ProcessOtherAsk(ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_InitNeed:
 		// 时间长的工作不能影响耳朵收听，新开协程
@@ -57,10 +63,6 @@ func (p *PersonAType) ProcessAsk(ask *go_best_type.AskType) {
 			p.ceoAnswer <- "finished"
 		}()
 	}
-}
-
-func (p *PersonAType) OnExited() {
-	p.Logger().InfoF("下班了")
 }
 
 func (p *PersonAType) Name() string {

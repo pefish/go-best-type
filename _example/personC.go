@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"time"
 
 	go_best_type "github.com/pefish/go-best-type"
@@ -11,13 +10,21 @@ type PersonCType struct {
 	go_best_type.BaseBestType
 }
 
-func NewPersonC(ctx context.Context, bestTypeManager *go_best_type.BestTypeManager) *PersonCType {
+func NewPersonC(bestTypeManager *go_best_type.BestTypeManager) *PersonCType {
 	p := &PersonCType{}
-	p.BaseBestType = *go_best_type.NewBaseBestType(ctx, p, bestTypeManager, 0)
+	p.BaseBestType = *go_best_type.NewBaseBestType(p, bestTypeManager, 0)
 	return p
 }
 
-func (p *PersonCType) ProcessAsk(ask *go_best_type.AskType) {
+func (p *PersonCType) Start(ask *go_best_type.AskType) {}
+
+func (p *PersonCType) Stop(ask *go_best_type.AskType) {
+	p.Logger().InfoF("下班了")
+}
+
+func (p *PersonCType) Terminal(ask *go_best_type.AskType) {}
+
+func (p *PersonCType) ProcessOtherAsk(ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_Develop:
 		go func() {
