@@ -66,7 +66,6 @@ func NewBaseBestType(
 				}(ask)
 			case ActionType_Stop:
 				stopCancel()
-				return
 			case ActionType_Terminal:
 				terminalCancel()
 				return
