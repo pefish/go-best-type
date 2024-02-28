@@ -35,7 +35,7 @@ func (b *BestTypeManager) Set(name string, bestType IBestType) {
 		for {
 			select {
 			case ask := <-bestType.AskChan():
-				bestType.ProcessAsk(b.ctx, ask)
+				bestType.ProcessAsk(ask)
 			case <-b.ctx.Done():
 				bestType.OnExited()
 				return

@@ -23,7 +23,7 @@ func NewPersonA(ctx context.Context, bestTypeManager *go_best_type.BestTypeManag
 	return p
 }
 
-func (p *PersonAType) ProcessAsk(ctx context.Context, ask *go_best_type.AskType) {
+func (p *PersonAType) ProcessAsk(ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_InitNeed:
 		// 时间长的工作不能影响耳朵收听，新开协程

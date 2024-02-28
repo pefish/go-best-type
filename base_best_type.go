@@ -15,10 +15,11 @@ type AskType struct {
 }
 
 type IBestType interface {
+	Context() context.Context
 	AskChan() chan *AskType
 	Ask(ask *AskType)
 	AskForAnswer(ask *AskType) interface{}
-	ProcessAsk(ctx context.Context, ask *AskType)
+	ProcessAsk(ask *AskType)
 	Name() string
 	BestTypeManager() *BestTypeManager
 	OnExited()
@@ -47,6 +48,10 @@ func NewBaseBestType(
 
 func (b *BaseBestType) AskChan() chan *AskType {
 	return b.askChan
+}
+
+func (b *BaseBestType) Context() context.Context {
+	return b.ctx
 }
 
 func (b *BaseBestType) Logger() go_logger.InterfaceLogger {
