@@ -35,15 +35,17 @@ func (b *BestTypeManager) ExitOne(name string, exitType ExitType) {
 		Action: ActionType_ExitAndReply,
 		Data:   exitType,
 	})
+	b.btsCollect.Delete(name)
 }
 
 func (b *BestTypeManager) ExitAll(exitType ExitType) {
 	b.btsCollect.Range(func(key any, value any) bool {
 		bestType := value.(IBestType)
-		bestType.Ask(&AskType{
+		bestType.AskForAnswer(&AskType{
 			Action: ActionType_ExitAndReply,
 			Data:   exitType,
 		})
+		b.btsCollect.Delete(bestType.Name())
 		return true
 	})
 }
