@@ -29,7 +29,6 @@ type AskType struct {
 type IBestType interface {
 	Start(exitChan <-chan ExitType, ask *AskType)
 	ProcessOtherAsk(exitChan <-chan ExitType, ask *AskType)
-	Name() string
 
 	// 每个人只能通过 ask 来沟通
 	Ask(ask *AskType)
@@ -37,9 +36,11 @@ type IBestType interface {
 
 	SetBestTypeManager(btm *BestTypeManager)
 	BestTypeManager() *BestTypeManager
+	Name() string
 }
 
 type BaseBestType struct {
+	name    string
 	logger  go_logger.InterfaceLogger
 	askChan chan *AskType
 	wg      sync.WaitGroup
@@ -51,11 +52,13 @@ type BaseBestType struct {
 
 func NewBaseBestType(
 	myself IBestType,
+	name string,
 ) *BaseBestType {
 	b := &BaseBestType{
-		logger:    go_logger.Logger.CloneWithPrefix(myself.Name()),
+		logger:    go_logger.Logger.CloneWithPrefix(name),
 		askChan:   make(chan *AskType),
 		exitChans: make([]chan ExitType, 0),
+		name:      name,
 	}
 
 	go func() {
@@ -98,6 +101,10 @@ func (b *BaseBestType) exit(exitType ExitType) {
 
 func (b *BaseBestType) Logger() go_logger.InterfaceLogger {
 	return b.logger
+}
+
+func (b *BaseBestType) Name() string {
+	return b.name
 }
 
 func (b *BaseBestType) BestTypeManager() *BestTypeManager {

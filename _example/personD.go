@@ -10,9 +10,9 @@ type PersonDType struct {
 	go_best_type.BaseBestType
 }
 
-func NewPersonD() *PersonDType {
+func NewPersonD(name string) *PersonDType {
 	p := &PersonDType{}
-	p.BaseBestType = *go_best_type.NewBaseBestType(p)
+	p.BaseBestType = *go_best_type.NewBaseBestType(p, name)
 	return p
 }
 
@@ -36,8 +36,4 @@ func (p *PersonDType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask
 	case <-exitChan:
 		p.Logger().InfoF("<%s> 做完了", ask.Action)
 	}
-}
-
-func (p *PersonDType) Name() string {
-	return "测试工程师"
 }

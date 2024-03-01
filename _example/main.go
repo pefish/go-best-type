@@ -29,16 +29,16 @@ func main() {
 
 	bestTypeManager := go_best_type.NewBestTypeManager() // 组建团队
 
-	personA := NewPersonA()
+	personA := NewPersonA("产品经理")
 	bestTypeManager.Set(personA) // 加入团队
 
-	personB := NewPersonB()
+	personB := NewPersonB("UI 设计师")
 	bestTypeManager.Set(personB)
 
-	personC := NewPersonC()
+	personC := NewPersonC("开发工程师")
 	bestTypeManager.Set(personC)
 
-	personD := NewPersonD()
+	personD := NewPersonD("测试工程师")
 	bestTypeManager.Set(personD)
 
 	// CEO 提出需求

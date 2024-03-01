@@ -11,9 +11,9 @@ type PersonAType struct {
 	ceoAnswer chan interface{}
 }
 
-func NewPersonA() *PersonAType {
+func NewPersonA(name string) *PersonAType {
 	p := &PersonAType{}
-	p.BaseBestType = *go_best_type.NewBaseBestType(p)
+	p.BaseBestType = *go_best_type.NewBaseBestType(p, name)
 	return p
 }
 
@@ -59,8 +59,4 @@ func (p *PersonAType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask
 	case <-exitChan:
 		p.Logger().InfoF("<%s> 做完了", ask.Action)
 	}
-}
-
-func (p *PersonAType) Name() string {
-	return "产品经理"
 }
