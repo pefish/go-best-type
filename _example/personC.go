@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"time"
 
 	go_best_type "github.com/pefish/go-best-type"
@@ -11,46 +10,41 @@ type PersonCType struct {
 	go_best_type.BaseBestType
 }
 
-func NewPersonC(bestTypeManager *go_best_type.BestTypeManager) *PersonCType {
+func NewPersonC() *PersonCType {
 	p := &PersonCType{}
-	p.BaseBestType = *go_best_type.NewBaseBestType(p, bestTypeManager, 0)
+	p.BaseBestType = *go_best_type.NewBaseBestType(p)
 	return p
 }
 
-func (p *PersonCType) Start(stopCtx context.Context, terminalCtx context.Context, ask *go_best_type.AskType) {
+func (p *PersonCType) Start(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) {
 }
 
-func (p *PersonCType) ProcessOtherAsk(stopCtx context.Context, terminalCtx context.Context, ask *go_best_type.AskType) {
+func (p *PersonCType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) {
 	switch ask.Action {
 	case ActionType_Develop:
 		go func() {
 			p.Logger().InfoF("收到开发任务 <%s>，开发中。。。", ask.Action)
-			time.Sleep(5 * time.Second)
+			time.Sleep(2 * time.Second)
 			p.Logger().InfoF("开发完成。向测试工程师提交测试")
-			p.BestTypeManager().Get("personD").Ask(&go_best_type.AskType{
+			p.BestTypeManager().Get("测试工程师").Ask(&go_best_type.AskType{
 				Action: "test",
 			})
 		}()
 	case ActionType_Bug:
 		go func() {
 			p.Logger().InfoF("收到 Bug <%s>，修复中。。。", ask.Action)
-			time.Sleep(5 * time.Second)
+			time.Sleep(2 * time.Second)
 			p.Logger().InfoF("修复完成。向测试工程师提交测试")
-			p.BestTypeManager().Get("personD").Ask(&go_best_type.AskType{
+			p.BestTypeManager().Get("测试工程师").Ask(&go_best_type.AskType{
 				Action: "test",
 			})
 		}()
 	}
 
 	select {
-	case <-stopCtx.Done():
+	case <-exitChan:
 		p.Logger().InfoF("<%s> 做完了", ask.Action)
-	case <-terminalCtx.Done():
 	}
-}
-
-func (p *PersonCType) OnExited() {
-	p.Logger().InfoF("下班了")
 }
 
 func (p *PersonCType) Name() string {

@@ -5,7 +5,6 @@ import (
 )
 
 type BestTypeManager struct {
-	wg         sync.WaitGroup
 	btsCollect sync.Map
 }
 
@@ -21,56 +20,30 @@ func (b *BestTypeManager) Get(name string) IBestType {
 	return v.(IBestType)
 }
 
-func (b *BestTypeManager) Set(name string, bestType IBestType) {
-	b.btsCollect.Store(name, bestType)
+func (b *BestTypeManager) Set(bestType IBestType) {
+	bestType.SetBestTypeManager(b)
+	b.btsCollect.Store(bestType.Name(), bestType)
 }
 
-func (b *BestTypeManager) StopOneAsync(name string) {
+func (b *BestTypeManager) ExitOne(name string, exitType ExitType) {
 	v, ok := b.btsCollect.Load(name)
 	if !ok {
 		return
 	}
 	bestType := v.(IBestType)
-	bestType.Ask(&AskType{
-		Action: ActionType_Stop,
+	bestType.AskForAnswer(&AskType{
+		Action: ActionType_ExitAndReply,
+		Data:   exitType,
 	})
 }
 
-func (b *BestTypeManager) StopAllAsync() {
+func (b *BestTypeManager) ExitAll(exitType ExitType) {
 	b.btsCollect.Range(func(key any, value any) bool {
 		bestType := value.(IBestType)
 		bestType.Ask(&AskType{
-			Action: ActionType_Stop,
+			Action: ActionType_ExitAndReply,
+			Data:   exitType,
 		})
 		return true
 	})
-}
-
-func (b *BestTypeManager) TerminalOneAsync(name string) {
-	v, ok := b.btsCollect.Load(name)
-	if !ok {
-		return
-	}
-	bestType := v.(IBestType)
-	bestType.Ask(&AskType{
-		Action: ActionType_Terminal,
-	})
-}
-
-func (b *BestTypeManager) TerminalAllAsync() {
-	b.btsCollect.Range(func(key any, value any) bool {
-		bestType := value.(IBestType)
-		bestType.Ask(&AskType{
-			Action: ActionType_Terminal,
-		})
-		return true
-	})
-}
-
-func (b *BestTypeManager) Wait() {
-	b.wg.Wait()
-}
-
-func (b *BestTypeManager) WaitGroup() *sync.WaitGroup {
-	return &b.wg
 }
