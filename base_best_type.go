@@ -27,8 +27,8 @@ type AskType struct {
 }
 
 type IBestType interface {
-	Start(exitChan <-chan ExitType, ask *AskType)
-	ProcessOtherAsk(exitChan <-chan ExitType, ask *AskType)
+	Start(exitChan <-chan ExitType, ask *AskType) error
+	ProcessOtherAsk(exitChan <-chan ExitType, ask *AskType) error
 
 	// 每个人只能通过 ask 来沟通
 	Ask(ask *AskType)
@@ -71,15 +71,17 @@ func NewBaseBestType(
 				b.wg.Add(1)
 				go func(ask *AskType) {
 					defer b.wg.Done()
-					myself.Start(exitChan, ask)
-					b.logger.DebugF("Start end.")
-					<-exitChan
+					err := myself.Start(exitChan, ask)
+					if err != nil { // 如果错误退出了，则继续等待退出命令
+						<-exitChan
+					}
+					b.logger.DebugF("Start ended.")
 				}(ask)
 			case ActionType_ExitAndReply:
 				exitType := ask.Data.(ExitType)
-				b.logger.DebugF("Notify to exit.")
+				b.logger.DebugF("Notify and wait exit.")
 				b.exit(exitType)
-				b.logger.DebugF("Notify to exit done.")
+				b.logger.DebugF("Notify and wait exit done.")
 				b.logger.DebugF("Anwser <%s>.", ask.Action)
 				ask.AnswerChan <- true
 				b.logger.DebugF("Anwser <%s> done.", ask.Action)
@@ -90,9 +92,11 @@ func NewBaseBestType(
 				b.wg.Add(1)
 				go func(ask *AskType) {
 					defer b.wg.Done()
-					myself.ProcessOtherAsk(exitChan, ask)
+					err := myself.ProcessOtherAsk(exitChan, ask)
+					if err != nil {
+						<-exitChan
+					}
 					b.logger.DebugF("ProcessOtherAsk end.")
-					<-exitChan
 				}(ask)
 			}
 		}

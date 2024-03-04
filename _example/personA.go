@@ -17,10 +17,11 @@ func NewPersonA(name string) *PersonAType {
 	return p
 }
 
-func (p *PersonAType) Start(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) {
+func (p *PersonAType) Start(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) error {
+	return nil
 }
 
-func (p *PersonAType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) {
+func (p *PersonAType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) error {
 	switch ask.Action {
 	case ActionType_InitNeed:
 		// 时间长的工作不能影响耳朵收听，新开协程
@@ -59,4 +60,6 @@ func (p *PersonAType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask
 	case <-exitChan:
 		p.Logger().InfoF("<%s> 做完了", ask.Action)
 	}
+
+	return nil
 }

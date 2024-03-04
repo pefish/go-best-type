@@ -16,10 +16,11 @@ func NewPersonC(name string) *PersonCType {
 	return p
 }
 
-func (p *PersonCType) Start(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) {
+func (p *PersonCType) Start(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) error {
+	return nil
 }
 
-func (p *PersonCType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) {
+func (p *PersonCType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask *go_best_type.AskType) error {
 	switch ask.Action {
 	case ActionType_Develop:
 		go func() {
@@ -45,4 +46,6 @@ func (p *PersonCType) ProcessOtherAsk(exitChan <-chan go_best_type.ExitType, ask
 	case <-exitChan:
 		p.Logger().InfoF("<%s> 做完了", ask.Action)
 	}
+
+	return nil
 }
