@@ -73,6 +73,7 @@ func NewBaseBestType(
 					defer b.wg.Done()
 					myself.Start(exitChan, ask)
 					b.logger.DebugF("Start end.")
+					<-exitChan
 				}(ask)
 			case ActionType_ExitAndReply:
 				exitType := ask.Data.(ExitType)
@@ -91,6 +92,7 @@ func NewBaseBestType(
 					defer b.wg.Done()
 					myself.ProcessOtherAsk(exitChan, ask)
 					b.logger.DebugF("ProcessOtherAsk end.")
+					<-exitChan
 				}(ask)
 			}
 		}
