@@ -63,6 +63,7 @@ func NewBaseBestType(
 
 	go func() {
 		for ask := range b.askChan {
+			b.logger.DebugF("Received <%s> ask.", ask.Action)
 			switch ask.Action {
 			case ActionType_Start:
 				exitChan := make(chan ExitType)
@@ -71,11 +72,16 @@ func NewBaseBestType(
 				go func(ask *AskType) {
 					defer b.wg.Done()
 					myself.Start(exitChan, ask)
+					b.logger.DebugF("Start end.")
 				}(ask)
 			case ActionType_ExitAndReply:
 				exitType := ask.Data.(ExitType)
+				b.logger.DebugF("Notify to exit.")
 				b.exit(exitType)
+				b.logger.DebugF("Notify to exit done.")
+				b.logger.DebugF("Anwser <%s>.", ask.Action)
 				ask.AnswerChan <- true
+				b.logger.DebugF("Anwser <%s> done.", ask.Action)
 				return
 			default:
 				exitChan := make(chan ExitType)
@@ -84,6 +90,7 @@ func NewBaseBestType(
 				go func(ask *AskType) {
 					defer b.wg.Done()
 					myself.ProcessOtherAsk(exitChan, ask)
+					b.logger.DebugF("ProcessOtherAsk end.")
 				}(ask)
 			}
 		}
