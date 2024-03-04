@@ -27,7 +27,7 @@ func main() {
 	// C：接收开发任务、接收 Bug
 	// D：接收测试任务、接收 Bug 验收
 
-	bestTypeManager := go_best_type.NewBestTypeManager() // 组建团队
+	bestTypeManager := go_best_type.NewBestTypeManager(go_logger.Logger) // 组建团队
 
 	personA := NewPersonA("产品经理")
 	bestTypeManager.Set(personA) // 加入团队
