@@ -45,6 +45,10 @@ func (b *BestTypeManager) ExitOne(name string, exitType ExitType) {
 	b.btsCollect.Delete(name)
 }
 
+func (b *BestTypeManager) ExitSelf(name string) {
+	b.btsCollect.Delete(name)
+}
+
 func (b *BestTypeManager) ExitAll(exitType ExitType) {
 	b.btsCollect.Range(func(key any, value any) bool {
 		bestType := value.(IBestType)
